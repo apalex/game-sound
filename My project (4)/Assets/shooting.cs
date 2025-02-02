@@ -4,20 +4,13 @@ using UnityEngine;
 
 public class shooting : MonoBehaviour
 {
-    public GameObject bulletPrefab; 
-    public Transform firePoint; 
-    public float bulletSpeed = 10f;
-    private SpriteRenderer spriteRenderer;
-    // Start is called before the first frame update
-    void Start()
-    {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-    }
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+    public float bulletSpeed = 1000f;
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) 
+        if (Input.GetMouseButtonDown(0)) 
         {
             Shoot();
         }
@@ -25,10 +18,17 @@ public class shooting : MonoBehaviour
 
     void Shoot()
     {
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePos.z = 0f; 
+
+        Vector2 direction = (mousePos - firePoint.position).normalized;
+
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
 
-        float direction = spriteRenderer.flipX ? -1f : 1f;
-        rb.velocity = new Vector2(direction * bulletSpeed, 0f);
+        rb.velocity = direction * bulletSpeed;
+
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        bullet.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
     }
 }
